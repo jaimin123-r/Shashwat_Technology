@@ -1,7 +1,7 @@
 import React from "react";
 import BlurText from "./reactbit/BlurText/BlurText";
 import Navbar from "./components/Navbar";
-import Grp_card from "./components/Grp_Card";
+import Grp_card from "./components/GrpCards";
 import Footer from "./components/Footer";
 
 function App() {
