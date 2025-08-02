@@ -5,10 +5,6 @@ import Grp_card from "./components/Grp_Card";
 import Footer from "./components/Footer";
 
 function App() {
-  const handleAnimationComplete = () => {
-    console.log("Animation completed!");
-  };
-
   return (
     <>
      <Navbar/>
