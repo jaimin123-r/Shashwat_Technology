@@ -1,434 +1,578 @@
 import React, { useState, useEffect } from 'react';
-import { Search, MapPin, Calendar, Users, Menu, X } from 'lucide-react';
+import { Search, MapPin, Calendar, Users, Menu, X, Globe, Plus, Minus, ChevronDown } from 'lucide-react';
 
 const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [location, setLocation] = useState('');
-  const [dates, setDates] = useState('');
-  const [guests, setGuests] = useState('');
-  const [focusedField, setFocusedField] = useState('');
+  const [checkIn, setCheckIn] = useState('');
+  const [checkOut, setCheckOut] = useState('');
+  const [guests, setGuests] = useState(2);
+  const [pets, setPets] = useState(0);
+  const [activeModal, setActiveModal] = useState('');
+  const [locationResults, setLocationResults] = useState([]);
+
+  // Popular locations for search suggestions
+  const popularLocations = [
+    'Paris, France', 'Tokyo, Japan', 'New York, USA', 'London, UK',
+    'Bali, Indonesia', 'Barcelona, Spain', 'Rome, Italy', 'Amsterdam, Netherlands',
+    'Sydney, Australia', 'Dubai, UAE', 'Bangkok, Thailand', 'Berlin, Germany'
+  ];
 
   useEffect(() => {
     const handleScroll = () => {
       const scrollTop = window.scrollY;
-      setIsScrolled(scrollTop > 150);
+      setIsScrolled(scrollTop > 100);
     };
 
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  const getDisplayValue = (value, placeholder) => {
-    return value || placeholder;
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (activeModal && !event.target.closest('.modal-content')) {
+        setActiveModal('');
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [activeModal]);
+
+  const handleLocationSearch = (query) => {
+    setLocation(query);
+    if (query.length > 0) {
+      const filtered = popularLocations.filter(loc => 
+        loc.toLowerCase().includes(query.toLowerCase())
+      );
+      setLocationResults(filtered);
+    } else {
+      setLocationResults([]);
+    }
   };
 
-  const handleInputFocus = (field) => {
-    setFocusedField(field);
+  const selectLocation = (selectedLocation) => {
+    setLocation(selectedLocation);
+    setLocationResults([]);
+    setActiveModal('');
   };
 
-  const handleInputBlur = () => {
-    setFocusedField('');
+  const incrementGuests = () => {
+    if (guests < 20) setGuests(guests + 1);
   };
+
+  const decrementGuests = () => {
+    if (guests > 1) setGuests(guests - 1);
+  };
+
+  const incrementPets = () => {
+    if (pets < 20) setPets(pets + 1);
+  };
+
+  const decrementPets = () => {
+    if (pets > 0) setPets(pets - 1);
+  };
+
+  const formatGuestDisplay = () => {
+    let display = `${guests} guest${guests !== 1 ? 's' : ''}`;
+    if (pets > 0) {
+      display += `, ${pets} pet${pets !== 1 ? 's' : ''}`;
+    }
+    return display;
+  };
+
+  const getTodayDate = () => {
+    return new Date().toISOString().split('T')[0];
+  };
+
+  const peopleImages = [
+    'https://images.unsplash.com/photo-1494790108755-2616b612b47c?w=80&h=80&fit=crop&crop=face',
+    'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=80&h=80&fit=crop&crop=face',
+    'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=80&h=80&fit=crop&crop=face',
+    'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=80&h=80&fit=crop&crop=face',
+    'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=80&h=80&fit=crop&crop=face'
+  ];
 
   return (
-    <div className="relative min-h-screen overflow-hidden bg-black">
-      {/* Background Video */}
-      <div className="absolute inset-0 w-full h-full">
-        <div className="relative w-full h-full overflow-hidden">
-          {/* Video Background - Replace with actual video */}
-          <video 
-            className="absolute inset-0 w-full object-cover"
-            autoPlay 
-            muted 
-            loop 
-            playsInline
-            style={{
-              filter: 'brightness(0.3)',
-              animation: 'slowZoom 30s ease-in-out infinite'
-            }}
-          >
-            {/* Add your video sources here */}
-            <source src="back.mp4" type="video/mp4" />
-            {/* Fallback for when video is not available */}
-          </video>
-          
-          {/* Fallback animated background when video is not available */}
-          <div 
-            className="absolute inset-0 opacity-60"
-            style={{
-              background: `
-                radial-gradient(circle at 20% 80%, rgba(120, 119, 198, 0.3) 0%, rgba(255, 255, 255, 0) 50%),
-                radial-gradient(circle at 80% 20%, rgba(255, 119, 198, 0.3) 0%, rgba(255, 255, 255, 0) 50%),
-                radial-gradient(circle at 40% 40%, rgba(120, 219, 255, 0.2) 0%, rgba(255, 255, 255, 0) 50%),
-                linear-gradient(135deg, #0f0f0f 0%, #1a1a1a 50%, #0f0f0f 100%)
-              `,
-              animation: 'float 15s ease-in-out infinite, zoom 25s ease-in-out infinite'
-            }}
-          />
-          
-          {/* Moving particles effect */}
-          <div className="absolute inset-0 opacity-20">
-            {Array.from({ length: 20 }, (_, i) => (
-              <div
-                key={i}
-                className="absolute w-1 h-1 bg-white rounded-full animate-pulse"
-                style={{
-                  left: `${Math.random() * 100}%`,
-                  top: `${Math.random() * 100}%`,
-                  animationDelay: `${Math.random() * 5}s`,
-                  animationDuration: `${3 + Math.random() * 4}s`
-                }}
-              />
-            ))}
-          </div>
-          
-          {/* Overlay */}
-          <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-transparent to-black/50" />
-        </div>
-      </div>
+    <div className="relative h-96 overflow-hidden bg-black">
+           {/* Background Video */}
+<div className="absolute inset-0 w-full h-full">
+  <div className="relative w-full h-full overflow-hidden">
+    {/* Video Background */}
+    <video 
+      className="absolute inset-0 w-full h-full object-cover"
+      autoPlay 
+      muted 
+      loop 
+      playsInline
+      style={{
+        filter: 'brightness(0.3)',
+        animation: 'slowZoom 30s ease-in-out infinite'
+      }}
+    >
+      <source src="back.mp4" type="video/mp4" />
+    </video>
+
+    {/* Fallback animated background with black theme */}
+    <div 
+      className="absolute inset-0 opacity-70"
+      style={{
+        background: `
+          radial-gradient(circle at 20% 80%, rgba(50, 50, 50, 0.4) 0%, rgba(0, 0, 0, 0) 60%),
+          radial-gradient(circle at 80% 20%, rgba(80, 80, 80, 0.3) 0%, rgba(0, 0, 0, 0) 60%),
+          radial-gradient(circle at 40% 40%, rgba(100, 100, 100, 0.2) 0%, rgba(0, 0, 0, 0) 60%),
+          linear-gradient(135deg, #0f0f0f 0%, #121212 50%, #0a0a0a 100%)
+        `,
+        animation: 'float 15s ease-in-out infinite, zoom 25s ease-in-out infinite'
+      }}
+    />
+
+    {/* Moving particles - subtle for dark mode */}
+    <div className="absolute inset-0 opacity-10">
+      {Array.from({ length: 20 }, (_, i) => (
+        <div
+          key={i}
+          className="absolute w-1 h-1 bg-gray-400 rounded-full animate-pulse"
+          style={{
+            left: `${Math.random() * 100}%`,
+            top: `${Math.random() * 100}%`,
+            animationDelay: `${Math.random() * 5}s`,
+            animationDuration: `${3 + Math.random() * 4}s`
+          }}
+        />
+      ))}
+    </div>
+
+    {/* Overlay to enhance black effect */}
+    <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-transparent to-black/80" />
+  </div>
+</div>
+
+     
 
       {/* Navbar */}
-      <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-700 ease-out ${
-        isScrolled 
-          ? 'bg-black/95 backdrop-blur-lg border-b border-white/10 py-3 shadow-2xl' 
-          : 'bg-transparent py-4 lg:py-6'
-      }`}>
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between">
-            {/* Logo */}
-            <div className="flex items-center animate-fadeInLeft">
-              <div className="text-xl lg:text-2xl font-bold text-white flex items-center space-x-2">
-                <div className="w-8 h-8 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full flex items-center justify-center animate-spin-slow">
-                  <div className="w-3 h-3 bg-white rounded-full"></div>
-                </div>
-                <span>Wander</span>
-              </div>
-            </div>
+  <nav
+  className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ease-out ${
+    isScrolled
+      ? 'bg-black/95 backdrop-blur-lg border-b border-gray-700/20 py-0'
+      : 'bg-transparent py-0'
+  }`}
+>
+  <div className="relative w-full h-14">
+    
+    {/* Logo - Exact top-left corner */}
+    <div className="absolute top-0 left-0 h-14 flex items-center pl-2">
+      <div className="text-2xl lg:text-3xl font-extrabold text-white flex items-center space-x-1">
+        <Globe className="w-7 h-7" />
+        <span>Wander</span>
+      </div>
+    </div>
 
-            {/* Desktop Search Bar - appears when scrolled - ONLY ON DESKTOP */}
-            <div className={`hidden lg:block transition-all duration-700 ease-out ${
-              isScrolled 
-                ? 'opacity-100 transform translate-y-0 scale-100' 
-                : 'opacity-0 transform translate-y-4 scale-95 pointer-events-none'
-            }`}>
-              <div className="bg-white/10 backdrop-blur-lg rounded-full border border-white/20 flex items-center max-w-2xl hover:bg-white/15 transition-all duration-300">
-                <button className="flex items-center space-x-2 px-4 py-3 hover:bg-white/10 rounded-l-full transition-all duration-300 group flex-1 min-w-0">
-                  <MapPin className="w-4 h-4 text-white/70 group-hover:text-white group-hover:scale-110 transition-all flex-shrink-0" />
-                  <span className="text-sm text-white font-medium truncate">
-                    {getDisplayValue(location, 'Wherever')}
-                  </span>
-                </button>
-                
-                <div className="w-px h-6 bg-white/20"></div>
-                
-                <button className="flex items-center space-x-2 px-4 py-3 hover:bg-white/10 transition-all duration-300 group flex-1 min-w-0">
-                  <Calendar className="w-4 h-4 text-white/70 group-hover:text-white group-hover:scale-110 transition-all flex-shrink-0" />
-                  <span className="text-sm text-white font-medium truncate">
-                    {getDisplayValue(dates, 'Whenever')}
-                  </span>
-                </button>
-                
-                <div className="w-px h-6 bg-white/20"></div>
-                
-                <button className="flex items-center space-x-2 px-4 py-3 hover:bg-white/10 transition-all duration-300 group flex-1 min-w-0">
-                  <Users className="w-4 h-4 text-white/70 group-hover:text-white group-hover:scale-110 transition-all flex-shrink-0" />
-                  <span className="text-sm text-white font-medium truncate">
-                    {getDisplayValue(guests, '2 guests, 1 pet')}
-                  </span>
-                </button>
-                
-                <button className="p-3 bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 rounded-full transition-all duration-300 hover:scale-110 hover:shadow-lg hover:shadow-purple-500/25 ml-2 flex-shrink-0">
-                  <Search className="w-4 h-4 text-white" />
-                </button>
-              </div>
-            </div>
+    {/* Sign in - Exact top-right corner */}
+    <div className="absolute top-0 right-0 h-14 flex items-center pr-2">
+      <button className="text-white text-sm lg:text-base font-semibold border border-gray-600/40 px-4 py-2 rounded-full hover:bg-gray-800/50 transition-all duration-300">
+        Sign in
+      </button>
+    </div>
 
-            {/* Mobile Menu Button */}
-            <button 
-              className="lg:hidden text-white p-2 hover:bg-white/10 rounded-lg transition-all duration-300"
-              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-            >
-              {isMobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
-            </button>
+    {/* Search Bar - Centered */}
+    <div
+      className={`hidden lg:block transition-all duration-500 ease-out absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 ${
+        isScrolled
+          ? 'opacity-100 scale-100'
+          : 'opacity-0 scale-95 pointer-events-none'
+      }`}
+    >
+      <div className="bg-black/90 backdrop-blur-lg rounded-lg border border-gray-600/30 flex items-center transition-all duration-300">
+        {/* Location */}
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            setActiveModal('location');
+          }}
+          className="flex items-center space-x-2 px-4 py-2 hover:bg-gray-800/40 transition-all duration-300 group flex-1 min-w-[140px]"
+        >
+          <MapPin className="w-4 h-4 text-gray-400 group-hover:text-white" />
+          <span className="text-sm text-white font-medium truncate">
+            {location || 'Wherever'}
+          </span>
+        </button>
 
-            {/* Desktop Sign in */}
-            <div className="hidden lg:block animate-fadeInRight">
-              <button className="text-white/90 hover:text-white text-sm font-medium border border-white/20 px-6 py-2 rounded-full hover:bg-white/10 transition-all duration-300 hover:scale-105">
-                Sign in or sign up for free
-              </button>
-            </div>
-          </div>
-        </div>
+        <div className="w-px h-8 bg-gray-600/30" />
 
-        {/* Mobile Menu */}
-        <div className={`lg:hidden transition-all duration-500 ease-out ${
-          isMobileMenuOpen 
-            ? 'max-h-96 opacity-100' 
-            : 'max-h-0 opacity-0 overflow-hidden'
-        }`}>
-          <div className="px-4 py-6 bg-black/95 backdrop-blur-lg border-t border-white/10 mt-4">
-            <div className="space-y-4">
-              <button className="block w-full text-left text-white/90 hover:text-white py-2 px-4 rounded-lg hover:bg-white/10 transition-all duration-300">
-                Sign in or sign up for free
-              </button>
-            </div>
-          </div>
-        </div>
-      </nav>
+        {/* Dates */}
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            setActiveModal('dates');
+          }}
+          className="flex items-center space-x-2 px-4 py-2 hover:bg-gray-800/40 transition-all duration-300 group flex-1 min-w-[120px]"
+        >
+          <Calendar className="w-4 h-4 text-gray-400 group-hover:text-white" />
+          <span className="text-sm text-white font-medium truncate">
+            {checkIn && checkOut ? `${checkIn} - ${checkOut}` : 'Whenever'}
+          </span>
+        </button>
+
+        <div className="w-px h-8 bg-gray-600/30" />
+
+        {/* Guests */}
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            setActiveModal('guests');
+          }}
+          className="flex items-center space-x-2 px-4 py-2 hover:bg-gray-800/40 transition-all duration-300 group flex-1 min-w-[120px]"
+        >
+          <Users className="w-4 h-4 text-gray-400 group-hover:text-white" />
+          <span className="text-sm text-white font-medium truncate">
+            {formatGuestDisplay()}
+          </span>
+        </button>
+
+        {/* Search Icon */}
+        <button className="p-2 bg-gray-800 hover:bg-gray-700 rounded-lg transition-all duration-300 hover:scale-105 ml-2 flex-shrink-0">
+          <Search className="w-2 h-2 text-white" />
+        </button>
+      </div>
+    </div>
+
+    {/* Mobile Menu Button */}
+    <div className="absolute right-2 top-1.5 lg:hidden">
+      <button
+        className="text-white p-2 hover:bg-gray-800/40 rounded-lg transition-all duration-300"
+        onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+      >
+        {isMobileMenuOpen ? (
+          <X className="w-4 h-4" />
+        ) : (
+          <Menu className="w-4 h-4" />
+        )}
+      </button>
+    </div>
+  </div>
+</nav>
+
+        
 
       {/* Hero Content */}
-      <div className="relative z-10 flex items-center justify-center min-h-screen px-4">
-        <div className="text-center max-w-6xl mx-auto">
+      <div className="relative z-10 flex mt-20 justify-center h-screen px-4">
+        <div className="text-center max-w-4xl mx-auto">
           {/* Main Heading */}
-          <h1 className={`text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-bold text-white mb-6 lg:mb-8 leading-tight transition-all duration-1000 ease-out ${
-            isScrolled ? 'opacity-0 transform translate-y-12 scale-95' : 'opacity-100 transform translate-y-0 scale-100 animate-fadeInUp'
+          <h1 className={`text-xl sm:text-3xl md:text-4xl lg:text-4xl font-bold text-white mb-4 leading-tight transition-all duration-1000 ease-out ${
+            isScrolled ? 'opacity-0 transform translate-y-8' : 'opacity-100 transform translate-y-0'
           }`}>
-            Find your 
-            <span className="block bg-gradient-to-r from-purple-400 via-pink-400 to-blue-400 bg-clip-text text-transparent animate-gradient">
-              happy place.
-            </span>
+            Find your happy place.
           </h1>
 
           {/* Subtitle */}
-          <p className={`text-base sm:text-lg md:text-xl lg:text-2xl text-white/80 mb-8 lg:mb-12 max-w-4xl mx-auto leading-relaxed transition-all duration-1000 delay-200 ease-out ${
-            isScrolled ? 'opacity-0 transform translate-y-12' : 'opacity-100 transform translate-y-0 animate-fadeInUp'
+          <p className={`text-xs sm:text-sm md:text-base lg:text-lg text-gray-300 mb-4 lg:mb-6 max-w-2xl mx-auto leading-relaxed transition-all duration-1000 delay-200 ease-out ${
+            isScrolled ? 'opacity-0 transform translate-y-8' : 'opacity-100 transform translate-y-0'
           }`}>
-            Book a Wander with inspiring views, hotel-grade amenities, dreamy beds, pristine 
-            cleaning and 24/7 concierge service. Your best trip ever is a few clicks away.
+            Book a Wander with inspiring views, hotel-grade amenities, dreamy beds, and 24/7 concierge service.
           </p>
 
           {/* User Count */}
-          <div className={`flex items-center justify-center space-x-3 mb-8 lg:mb-12 transition-all duration-1000 delay-300 ease-out ${
-            isScrolled ? 'opacity-0 transform translate-y-12' : 'opacity-100 transform translate-y-0 animate-fadeInUp'
+          <div className={`flex items-center justify-center space-x-2 mb-4 lg:mb-6 transition-all duration-1000 delay-300 ease-out ${
+            isScrolled ? 'opacity-0 transform translate-y-8' : 'opacity-100 transform translate-y-0'
           }`}>
-            <div className="flex -space-x-2">
-              {[
-                'from-purple-400 to-pink-500',
-                'from-blue-400 to-cyan-500',
-                'from-green-400 to-emerald-500',
-                'from-yellow-400 to-orange-500',
-                'from-red-400 to-pink-500'
-              ].map((gradient, i) => (
-                <div 
+            <div className="flex -space-x-1">
+              {peopleImages.map((imageUrl, i) => (
+                <img 
                   key={i}
-                  className={`w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-gradient-to-r ${gradient} border-2 border-black shadow-lg animate-bounce`}
-                  style={{ animationDelay: `${i * 0.1}s` }}
+                  src={imageUrl}
+                  alt={`User ${i + 1}`}
+                  className="w-6 h-6 sm:w-8 sm:h-8 rounded-full border-2 border-black shadow-lg object-cover"
+                  onError={(e) => {
+                    e.target.src = `https://ui-avatars.com/api/?name=User+${i+1}&background=random&size=32`;
+                  }}
                 />
               ))}
             </div>
-            <span className="text-white/70 text-sm sm:text-base font-medium">Join 562,888 Wanderers and counting...</span>
+            <span className="text-gray-400 text-xs sm:text-sm font-medium">562,888 Wanderers</span>
           </div>
 
           {/* Search Form */}
           <div className={`transition-all duration-1000 delay-400 ease-out ${
-            isScrolled ? 'opacity-0 transform translate-y-12 scale-90' : 'opacity-100 transform translate-y-0 scale-100 animate-fadeInUp'
+            isScrolled ? 'opacity-0 transform translate-y-8' : 'opacity-100 transform translate-y-0'
           }`}>
-            <div className="bg-white/10 backdrop-blur-lg rounded-2xl lg:rounded-3xl border border-white/20 p-3 lg:p-4 max-w-5xl mx-auto shadow-2xl hover:bg-white/15 transition-all duration-500">
+            <div className="bg-black/30 backdrop-blur-lg rounded-xl border border-gray-600/20 p-2 lg:p-3 max-w-3xl mx-auto shadow-2xl">
               
               {/* Desktop Layout */}
-              <div className="hidden md:grid md:grid-cols-4 gap-2 lg:gap-3">
+              <div className="hidden md:grid md:grid-cols-4 gap-1 lg:gap-2">
                 {/* Location */}
-                <div className="group p-3 lg:p-4 hover:bg-white/10 rounded-xl lg:rounded-2xl transition-all duration-300 cursor-pointer">
-                  <div className="flex items-center space-x-3">
-                    <MapPin className="w-5 h-5 lg:w-6 lg:h-6 text-white/60 group-hover:text-white group-hover:scale-110 transition-all duration-300 flex-shrink-0" />
+                <div 
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setActiveModal('location');
+                  }}
+                  className="group p-2 lg:p-3 hover:bg-gray-800/30 rounded-lg cursor-pointer transition-all duration-300"
+                >
+                  <div className="flex items-center space-x-2">
+                    <MapPin className="w-4 h-4 text-gray-400 group-hover:text-white transition-all flex-shrink-0" />
                     <div className="flex-1 min-w-0">
-                      <div className="text-xs lg:text-sm font-semibold text-white/60 uppercase tracking-wide mb-1">Location</div>
-                      <input 
-                        type="text" 
-                        value={location}
-                        onChange={(e) => setLocation(e.target.value)}
-                        onFocus={() => handleInputFocus('location')}
-                        onBlur={handleInputBlur}
-                        className="text-sm lg:text-base font-medium text-white bg-transparent border-none outline-none w-full placeholder-white/40"
-                        placeholder={focusedField === 'location' ? '' : 'Wherever'}
-                      />
+                      <div className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-1">Where</div>
+                      <div className="text-xs lg:text-sm font-medium text-white truncate">
+                        {location || 'Wherever'}
+                      </div>
                     </div>
                   </div>
                 </div>
 
                 {/* Dates */}
-                <div className="group p-3 lg:p-4 hover:bg-white/10 rounded-xl lg:rounded-2xl transition-all duration-300 cursor-pointer">
-                  <div className="flex items-center space-x-3">
-                    <Calendar className="w-5 h-5 lg:w-6 lg:h-6 text-white/60 group-hover:text-white group-hover:scale-110 transition-all duration-300 flex-shrink-0" />
+                <div 
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setActiveModal('dates');
+                  }}
+                  className="group p-2 lg:p-3 hover:bg-gray-800/30 rounded-lg cursor-pointer transition-all duration-300"
+                >
+                  <div className="flex items-center space-x-2">
+                    <Calendar className="w-4 h-4 text-gray-400 group-hover:text-white transition-all flex-shrink-0" />
                     <div className="flex-1 min-w-0">
-                      <div className="text-xs lg:text-sm font-semibold text-white/60 uppercase tracking-wide mb-1">Dates</div>
-                      <input 
-                        type="text" 
-                        value={dates}
-                        onChange={(e) => setDates(e.target.value)}
-                        onFocus={() => handleInputFocus('dates')}
-                        onBlur={handleInputBlur}
-                        className="text-sm lg:text-base font-medium text-white bg-transparent border-none outline-none w-full placeholder-white/40"
-                        placeholder={focusedField === 'dates' ? '' : 'Whenever'}
-                      />
+                      <div className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-1">When</div>
+                      <div className="text-xs lg:text-sm font-medium text-white truncate">
+                        {checkIn && checkOut ? `${checkIn} - ${checkOut}` : 'Whenever'}
+                      </div>
                     </div>
                   </div>
                 </div>
 
                 {/* Guests */}
-                <div className="group p-3 lg:p-4 hover:bg-white/10 rounded-xl lg:rounded-2xl transition-all duration-300 cursor-pointer">
-                  <div className="flex items-center space-x-3">
-                    <Users className="w-5 h-5 lg:w-6 lg:h-6 text-white/60 group-hover:text-white group-hover:scale-110 transition-all duration-300 flex-shrink-0" />
+                <div 
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setActiveModal('guests');
+                  }}
+                  className="group p-2 lg:p-3 hover:bg-gray-800/30 rounded-lg cursor-pointer transition-all duration-300"
+                >
+                  <div className="flex items-center space-x-2">
+                    <Users className="w-4 h-4 text-gray-400 group-hover:text-white transition-all flex-shrink-0" />
                     <div className="flex-1 min-w-0">
-                      <div className="text-xs lg:text-sm font-semibold text-white/60 uppercase tracking-wide mb-1">Guests</div>
-                      <input 
-                        type="text" 
-                        value={guests}
-                        onChange={(e) => setGuests(e.target.value)}
-                        onFocus={() => handleInputFocus('guests')}
-                        onBlur={handleInputBlur}
-                        className="text-sm lg:text-base font-medium text-white bg-transparent border-none outline-none w-full placeholder-white/40"
-                        placeholder={focusedField === 'guests' ? '' : '2 guests, 1 pet'}
-                      />
+                      <div className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-1">Who</div>
+                      <div className="text-xs lg:text-sm font-medium text-white truncate">
+                        {formatGuestDisplay()}
+                      </div>
                     </div>
                   </div>
                 </div>
 
                 {/* Search Button */}
-                <div className="flex items-center justify-center p-2 lg:p-3">
-                  <button className="w-full h-12 lg:h-14 bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white rounded-xl lg:rounded-2xl shadow-lg hover:shadow-xl hover:shadow-purple-500/25 transition-all duration-300 flex items-center justify-center group hover:scale-105">
-                    <Search className="w-5 h-5 lg:w-6 lg:h-6 group-hover:scale-110 transition-transform duration-300" />
+                <div className="flex items-center justify-center p-1 lg:p-2">
+                  <button className="w-full h-10 lg:h-12 bg-gray-800 hover:bg-gray-700 text-white rounded-lg shadow-lg transition-all duration-300 flex items-center justify-center group hover:scale-105">
+                    <Search className="w-4 h-4 lg:w-5 lg:h-5 group-hover:scale-110 transition-transform" />
                   </button>
                 </div>
               </div>
 
-              {/* Mobile Layout - Simple Search Button Only */}
+              {/* Mobile Layout */}
               <div className="md:hidden">
-                <button className="w-full h-14 bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center space-x-3 group">
-                  <Search className="w-5 h-5 group-hover:scale-110 transition-transform" />
-                  <span className="font-semibold">Search Amazing Places</span>
-                </button>
+                <div className="grid grid-cols-2 gap-2 mb-3">
+                  <button 
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setActiveModal('location');
+                    }}
+                    className="p-3 bg-gray-800/40 hover:bg-gray-800/60 rounded-lg transition-all duration-300 text-left"
+                  >
+                    <div className="flex items-center space-x-2 mb-1">
+                      <MapPin className="w-3 h-3 text-gray-400" />
+                      <span className="text-xs text-gray-400 uppercase font-medium">Where</span>
+                    </div>
+                    <div className="text-sm text-white truncate">{location || 'Wherever'}</div>
+                  </button>
+                  
+                  <button 
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setActiveModal('dates');
+                    }}
+                    className="p-3 bg-gray-800/40 hover:bg-gray-800/60 rounded-lg transition-all duration-300 text-left"
+                  >
+                    <div className="flex items-center space-x-2 mb-1">
+                      <Calendar className="w-3 h-3 text-gray-400" />
+                      <span className="text-xs text-gray-400 uppercase font-medium">When</span>
+                    </div>
+                    <div className="text-sm text-white truncate">
+                      {checkIn && checkOut ? `${checkIn.split('-')[1]}/${checkIn.split('-')[2]} - ${checkOut.split('-')[1]}/${checkOut.split('-')[2]}` : 'Whenever'}
+                    </div>
+                  </button>
+                </div>
+                
+                <div className="grid grid-cols-2 gap-2">
+                  <button 
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setActiveModal('guests');
+                    }}
+                    className="p-3 bg-gray-800/40 hover:bg-gray-800/60 rounded-lg transition-all duration-300 text-left"
+                  >
+                    <div className="flex items-center space-x-2 mb-1">
+                      <Users className="w-3 h-3 text-gray-400" />
+                      <span className="text-xs text-gray-400 uppercase font-medium">Who</span>
+                    </div>
+                    <div className="text-sm text-white truncate">{formatGuestDisplay()}</div>
+                  </button>
+                  
+                  <button className="p-3 bg-gray-800 hover:bg-gray-700 text-white rounded-lg shadow-lg transition-all duration-300 flex items-center justify-center">
+                    <Search className="w-4 h-4 mr-2" />
+                    <span className="text-sm font-semibold">Search</span>
+                  </button>
+                </div>
               </div>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Dummy content for scrolling */}
-      {/* <div className="relative z-10 bg-gradient-to-b from-black to-gray-900">
-        <div className="max-w-6xl mx-auto px-4 py-16 lg:py-24">
-          <h2 className="text-3xl lg:text-4xl font-bold text-white mb-12 text-center animate-fadeInUp">Discover Amazing Places</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
-            {Array.from({ length: 9 }, (_, i) => (
-              <div key={i} className="bg-white/5 backdrop-blur-lg rounded-2xl p-6 border border-white/10 hover:bg-white/10 transition-all duration-500 hover:scale-105 hover:shadow-2xl group animate-fadeInUp" style={{animationDelay: `${i * 0.1}s`}}>
-                <div className="w-full h-48 bg-gradient-to-br from-purple-500/20 to-pink-500/20 rounded-xl mb-4 group-hover:scale-105 transition-transform duration-300"></div>
-                <h3 className="text-xl font-semibold mb-4 text-white group-hover:text-purple-300 transition-colors">Amazing Place {i + 1}</h3>
-                <p className="text-white/70 leading-relaxed">
-                  Discover breathtaking views and unforgettable experiences in this stunning location. 
-                  Perfect for your next adventure with world-class amenities.
-                </p>
+      {/* Modals */}
+      {activeModal && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-[100] flex items-center justify-center p-4">
+          {/* Location Modal */}
+          {activeModal === 'location' && (
+            <div className="modal-content bg-black/90 backdrop-blur-lg border border-gray-600/30 rounded-2xl p-6 w-full max-w-md max-h-[80vh] overflow-y-auto">
+              <h3 className="text-lg font-semibold text-white mb-4">Where to?</h3>
+              <input
+                type="text"
+                value={location}
+                onChange={(e) => handleLocationSearch(e.target.value)}
+                placeholder="Search destinations"
+                className="w-full p-3 bg-gray-800/50 border border-gray-600/30 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-gray-500 mb-4"
+                autoFocus
+              />
+              <div className="space-y-1 max-h-60 overflow-y-auto">
+                {(locationResults.length > 0 ? locationResults : popularLocations).map((loc, index) => (
+                  <button
+                    key={index}
+                    onClick={() => selectLocation(loc)}
+                    className="w-full p-3 text-left hover:bg-gray-800/50 rounded-lg transition-colors text-gray-300 hover:text-white"
+                  >
+                    <div className="flex items-center space-x-3">
+                      <MapPin className="w-4 h-4 text-gray-400" />
+                      <span className="text-sm">{loc}</span>
+                    </div>
+                  </button>
+                ))}
               </div>
-            ))}
-          </div>
-        </div>
-      </div> */}
+            </div>
+          )}
 
-      {/* Enhanced CSS Animations */}
+          {/* Dates Modal */}
+          {activeModal === 'dates' && (
+            <div className="modal-content bg-black/90 backdrop-blur-lg border border-gray-600/30 rounded-2xl p-6 w-full max-w-md">
+              <h3 className="text-lg font-semibold text-white mb-4">When?</h3>
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-300 mb-2">Check-in</label>
+                  <input
+                    type="date"
+                    value={checkIn}
+                    min={getTodayDate()}
+                    onChange={(e) => setCheckIn(e.target.value)}
+                    className="w-full p-3 bg-gray-800/50 border border-gray-600/30 rounded-lg text-white focus:outline-none focus:border-gray-500"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-300 mb-2">Check-out</label>
+                  <input
+                    type="date"
+                    value={checkOut}
+                    min={checkIn || getTodayDate()}
+                    onChange={(e) => setCheckOut(e.target.value)}
+                    className="w-full p-3 bg-gray-800/50 border border-gray-600/30 rounded-lg text-white focus:outline-none focus:border-gray-500"
+                  />
+                </div>
+                <button
+                  onClick={() => setActiveModal('')}
+                  className="w-full p-3 bg-gray-800 hover:bg-gray-700 text-white rounded-lg transition-colors font-medium"
+                >
+                  Done
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* Guests Modal */}
+          {activeModal === 'guests' && (
+            <div className="modal-content bg-black/90 backdrop-blur-lg border border-gray-600/30 rounded-2xl p-6 w-full max-w-md">
+              <h3 className="text-lg font-semibold text-white mb-4">Who's coming?</h3>
+              <div className="space-y-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <div className="text-white font-medium">Guests</div>
+                    <div className="text-sm text-gray-400">Ages 13 or above</div>
+                  </div>
+                  <div className="flex items-center space-x-3">
+                    <button
+                      onClick={decrementGuests}
+                      disabled={guests <= 1}
+                      className="w-8 h-8 rounded-full border border-gray-600 flex items-center justify-center text-white hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                    >
+                      <Minus className="w-3 h-3" />
+                    </button>
+                    <span className="w-8 text-center text-white font-medium">{guests}</span>
+                    <button
+                      onClick={incrementGuests}
+                      disabled={guests >= 20}
+                      className="w-8 h-8 rounded-full border border-gray-600 flex items-center justify-center text-white hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                    >
+                      <Plus className="w-3 h-3" />
+                    </button>
+                  </div>
+                </div>
+                
+                <div className="flex items-center justify-between">
+                  <div>
+                    <div className="text-white font-medium">Pets</div>
+                    <div className="text-sm text-gray-400">Bringing a service animal?</div>
+                  </div>
+                  <div className="flex items-center space-x-3">
+                    <button
+                      onClick={decrementPets}
+                      disabled={pets <= 0}
+                      className="w-8 h-8 rounded-full border border-gray-600 flex items-center justify-center text-white hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                    >
+                      <Minus className="w-3 h-3" />
+                    </button>
+                    <span className="w-8 text-center text-white font-medium">{pets}</span>
+                    <button
+                      onClick={incrementPets}
+                      disabled={pets >= 20}
+                      className="w-8 h-8 rounded-full border border-gray-600 flex items-center justify-center text-white hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                    >
+                      <Plus className="w-3 h-3" />
+                    </button>
+                  </div>
+                </div>
+                
+                <button
+                  onClick={() => setActiveModal('')}
+                  className="w-full p-3 bg-gray-800 hover:bg-gray-700 text-white rounded-lg transition-colors font-medium"
+                >
+                  Done
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* CSS Animations */}
       <style jsx>{`
-        @keyframes slowZoom {
-          0%, 100% {
-            transform: scale(1);
-          }
-          50% {
-            transform: scale(1.1);
-          }
+        .modal-content {
+          animation: modalSlideIn 0.3s ease-out forwards;
         }
         
-        @keyframes zoom {
-          0%, 100% {
-            transform: scale(1) rotate(0deg);
-          }
-          50% {
-            transform: scale(1.15) rotate(2deg);
-          }
-        }
-        
-        @keyframes float {
-          0%, 100% {
-            transform: translateY(0) translateX(0);
-          }
-          25% {
-            transform: translateY(-20px) translateX(10px);
-          }
-          50% {
-            transform: translateY(-10px) translateX(-10px);
-          }
-          75% {
-            transform: translateY(-30px) translateX(5px);
-          }
-        }
-        
-        @keyframes fadeInUp {
+        @keyframes modalSlideIn {
           from {
             opacity: 0;
-            transform: translateY(30px);
+            transform: translateY(20px) scale(0.95);
           }
           to {
             opacity: 1;
-            transform: translateY(0);
+            transform: translateY(0) scale(1);
           }
-        }
-        
-        @keyframes fadeInLeft {
-          from {
-            opacity: 0;
-            transform: translateX(-30px);
-          }
-          to {
-            opacity: 1;
-            transform: translateX(0);
-          }
-        }
-        
-        @keyframes fadeInRight {
-          from {
-            opacity: 0;
-            transform: translateX(30px);
-          }
-          to {
-            opacity: 1;
-            transform: translateX(0);
-          }
-        }
-        
-        @keyframes gradient {
-          0%, 100% {
-            background-position: 0% 50%;
-          }
-          50% {
-            background-position: 100% 50%;
-          }
-        }
-        
-        @keyframes spin-slow {
-          from {
-            transform: rotate(0deg);
-          }
-          to {
-            transform: rotate(360deg);
-          }
-        }
-        
-        .animate-fadeInUp {
-          animation: fadeInUp 0.8s ease-out forwards;
-        }
-        
-        .animate-fadeInLeft {
-          animation: fadeInLeft 0.8s ease-out forwards;
-        }
-        
-        .animate-fadeInRight {
-          animation: fadeInRight 0.8s ease-out forwards;
-        }
-        
-        .animate-gradient {
-          background-size: 200% 200%;
-          animation: gradient 3s ease infinite;
-        }
-        
-        .animate-spin-slow {
-          animation: spin-slow 8s linear infinite;
         }
       `}</style>
     </div>

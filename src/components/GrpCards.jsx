@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from 'react';
+import FilterBar from './FilterBar';
+import FilterModal from './FilterModel';
 import { 
   ChevronLeft, 
   ChevronRight, 
@@ -27,6 +29,8 @@ const Grp_card = () => {
   const [showFilterModal, setShowFilterModal] = useState(false);
   const [selectedFilters, setSelectedFilters] = useState([]);
 
+      const [selectedFilter, setSelectedFilter] = useState(null);
+
   const filters = [
     { id: 'for-you', label: 'For you', icon: Heart },
     { id: 'daily-deals', label: 'Daily deals', icon: Clock },
@@ -44,6 +48,12 @@ const Grp_card = () => {
     { id: 'national-parks', label: 'National parks', icon: TreePine },
     { id: 'long-stays', label: 'Long stays', icon: CalendarDays }
   ];
+
+  const filters2 = {
+  amenities: ["Wifi", "AC", "TV"],
+  rooms: ["1BHK", "2BHK", "3BHK"],
+  accommodations: ["Pets Allowed", "Smoking Allowed"]
+};
 
   const quickFilters = ['For you', 'Daily deals', 'Last-minute', 'Ocean', 'Mountain'];
 
@@ -314,9 +324,9 @@ const Grp_card = () => {
     };
 
     return (
-      <div className="bg-white rounded-3xl overflow-hidden shadow-lg hover:shadow-2xl transform hover:scale-105 transition-all duration-300">
+      <div className="bg-black overflow-hidden shadow-lg hover:shadow-2xl transform hover:scale-100 transition-all duration-300">
         {/* Image Container */}
-        <div className="relative h-64 overflow-hidden">
+        <div className="relative h-80 overflow-hidden">
           <div 
             className="flex w-full h-full transition-transform duration-500 ease-in-out"
             style={{ transform: `translateX(-${currentImageIndex * 100}%)` }}
@@ -334,26 +344,26 @@ const Grp_card = () => {
           {/* Navigation Arrows */}
           <button
             onClick={previousImage}
-            className="absolute left-3 top-1/2 transform -translate-y-1/2 bg-white bg-opacity-90 hover:bg-opacity-100 text-black rounded-full p-2 transition-all duration-300 hover:scale-110 shadow-lg"
+            className="bg-[#0000006c] absolute left-3 top-1/2 transform -translate-y-1/2  bg-opacity-90 hover:bg-opacity-100 text-white rounded-full p-2 transition-all duration-300 hover:scale-110 shadow-lg"
           >
-            <ChevronLeft size={18} />
+            <ChevronLeft size={10} />
           </button>
           
           <button
             onClick={nextImage}
-            className="absolute right-3 top-1/2 transform -translate-y-1/2 bg-white bg-opacity-90 hover:bg-opacity-100 text-black rounded-full p-2 transition-all duration-300 hover:scale-110 shadow-lg"
+            className="bg-[#0000006c] absolute right-3 top-1/2 transform -translate-y-1/2  bg-opacity-90 hover:bg-opacity-100 text-white rounded-full p-2 transition-all duration-300 hover:scale-110 shadow-lg"
           >
-            <ChevronRight size={18} />
+            <ChevronRight size={10} />
           </button>
           
           {/* Heart Button */}
           <button
             onClick={() => setIsLiked(!isLiked)}
-            className="absolute top-3 right-3 bg-white bg-opacity-90 hover:bg-opacity-100 rounded-full p-2 transition-all duration-300 hover:scale-110 shadow-lg"
+            className="absolute top-3 right-3 bg-[#5c5c5c84]  bg-opacity-90 hover:bg-opacity-100 rounded-lg p-2 transition-all duration-300 hover:scale-110 shadow-lg"
           >
             <Heart 
-              size={20} 
-              className={`${isLiked ? 'fill-red-500 text-red-500' : 'text-gray-700'} transition-colors duration-300`}
+              size={18} 
+              className={`${isLiked ? 'fill-red-500 text-red-500' : 'text-white'} transition-colors duration-300`}
             />
           </button>
           
@@ -375,35 +385,35 @@ const Grp_card = () => {
         
         {/* Card Content */}
         <div className="p-5">
-          <h5 className="text-sm font-medium text-gray-600 uppercase tracking-wider mb-2">
+          <h5 className="text-sm font-medium text-white uppercase tracking-wider">
             {hotel.location}
           </h5>
           
-          <h3 className="text-xl font-bold text-black mb-4 leading-tight">
+          <h3 className="text-xl font-bold text-white mb-2 leading-tight">
             {hotel.name}
           </h3>
           
           <div className="flex justify-between items-center">
-            <div className="text-sm font-semibold text-gray-800">
+            <div className="text-sm font-semibold text-white">
               Next Avail. {hotel.availability}
             </div>
             
             <div className="flex space-x-4">
               <div className="flex items-center space-x-1">
-                <Bed size={16} className="text-gray-700" />
-                <span className="text-sm font-medium text-gray-800">
+                <Bed size={16} className="text-white" />
+                <span className="text-sm font-medium text-white">
                   {hotel.amenities.beds}
                 </span>
               </div>
               <div className="flex items-center space-x-1">
-                <Bath size={16} className="text-gray-700" />
-                <span className="text-sm font-medium text-gray-800">
+                <Bath size={16} className="text-white" />
+                <span className="text-sm font-medium text-white">
                   {hotel.amenities.baths}
                 </span>
               </div>
               <div className="flex items-center space-x-1">
-                <Users size={16} className="text-gray-700" />
-                <span className="text-sm font-medium text-gray-800">
+                <Users size={16} className="text-white" />
+                <span className="text-sm font-medium text-white">
                   {hotel.amenities.people}
                 </span>
               </div>
@@ -415,128 +425,34 @@ const Grp_card = () => {
   };
 
   // Skeleton Loader
-  const SkeletonCard = () => (
-    <div className="bg-white rounded-3xl overflow-hidden shadow-lg">
-      <div className="w-full h-64 bg-gradient-to-r from-gray-200 via-gray-300 to-gray-200 bg-[length:200%_100%] animate-pulse"></div>
-      <div className="p-5 space-y-4">
-        <div className="h-4 bg-gradient-to-r from-gray-200 via-gray-300 to-gray-200 bg-[length:200%_100%] animate-pulse rounded w-3/5"></div>
-        <div className="h-6 bg-gradient-to-r from-gray-200 via-gray-300 to-gray-200 bg-[length:200%_100%] animate-pulse rounded w-full"></div>
-        <div className="h-4 bg-gradient-to-r from-gray-200 via-gray-300 to-gray-200 bg-[length:200%_100%] animate-pulse rounded w-4/5"></div>
-      </div>
+const SkeletonCard = () => (
+  <div className="bg-[#1a1a1a] overflow-hidden shadow-md">
+    <div className="w-full h-72 bg-gradient-to-r from-[#333] via-[#444] to-[#333] bg-[length:200%_100%] animate-pulse"></div>
+    <div className="p-5 space-y-4">
+      <div className="h-4 bg-gradient-to-r from-[#333] via-[#444] to-[#333] bg-[length:200%_100%] animate-pulse rounded w-3/5"></div>
+      <div className="h-6 bg-gradient-to-r from-[#333] via-[#444] to-[#333] bg-[length:200%_100%] animate-pulse rounded w-full"></div>
+      <div className="h-4 bg-gradient-to-r from-[#333] via-[#444] to-[#333] bg-[length:200%_100%] animate-pulse rounded w-4/5"></div>
+      <div className="h-4 bg-gradient-to-r from-[#333] via-[#444] to-[#333] bg-[length:200%_100%] animate-pulse rounded w-4/5"></div>
     </div>
-  );
+  </div>
+);
 
-  // Filter Modal
-  const FilterModal = () => (
-    <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
-      <div className="bg-white rounded-3xl max-w-4xl w-full max-h-[80vh] overflow-y-auto">
-        <div className="sticky top-0 bg-white border-b border-gray-200 p-6 rounded-t-3xl">
-          <div className="flex justify-between items-center">
-            <h2 className="text-2xl font-bold text-black">Filters</h2>
-            <button
-              onClick={() => setShowFilterModal(false)}
-              className="p-2 hover:bg-gray-100 rounded-full transition-colors duration-200"
-            >
-              <X size={24} className="text-gray-600" />
-            </button>
-          </div>
-        </div>
-        
-        <div className="p-6">
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-            {filters.map((filter) => {
-              const IconComponent = filter.icon;
-              const isSelected = selectedFilters.includes(filter.id);
-              
-              return (
-                <button
-                  key={filter.id}
-                  onClick={() => toggleFilter(filter.id)}
-                  className={`p-4 rounded-2xl border-2 transition-all duration-300 text-left hover:scale-105 ${
-                    isSelected 
-                      ? 'border-black bg-black text-white' 
-                      : 'border-gray-200 hover:border-gray-400 bg-white text-gray-800'
-                  }`}
-                >
-                  <div className="flex items-center space-x-3">
-                    <IconComponent size={20} />
-                    <span className="font-medium">{filter.label}</span>
-                  </div>
-                </button>
-              );
-            })}
-          </div>
-          
-          <div className="flex justify-between items-center mt-8 pt-6 border-t border-gray-200">
-            <button
-              onClick={clearAllFilters}
-              className="px-6 py-3 text-gray-600 hover:text-black transition-colors duration-200 font-medium"
-            >
-              Clear all
-            </button>
-            <button
-              onClick={() => setShowFilterModal(false)}
-              className="px-8 py-3 bg-black text-white rounded-full hover:bg-gray-800 transition-colors duration-300 font-medium"
-            >
-              Show results
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-
-  if (isLoading) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-black">
-        <div className="sticky top-0 bg-white bg-opacity-95 backdrop-blur-md border-b border-gray-200 z-40 p-4">
-          <div className="h-12 bg-gradient-to-r from-gray-200 via-gray-300 to-gray-200 bg-[length:200%_100%] animate-pulse rounded-full"></div>
-        </div>
-        <div className="container mx-auto px-4 py-8">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {[...Array(6)].map((_, index) => (
-              <SkeletonCard key={index} />
-            ))}
-          </div>
-        </div>
-      </div>
-    );
-  }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-black">
-      {/* Filter Bar */}
-      <div className="siticky top-0 bg-white bg-opacity-95 backdrop-blur-md border-b border-gray-200 z-40 p-4">
-        <div className="container mx-auto flex items-center space-x-4 overflow-x-auto scrollbar-hide">
-          {/* Quick Filters */}
-          {quickFilters.map((filter) => (
-            <button
-              key={filter}
-              onClick={() => toggleFilter(filter.toLowerCase().replace(' ', '-'))}
-              className={`px-6 py-3 rounded-full border-2 whitespace-nowrap transition-all duration-300 font-medium ${
-                selectedFilters.includes(filter.toLowerCase().replace(' ', '-'))
-                  ? 'border-black bg-black text-white'
-                  : 'border-gray-300 hover:border-gray-400 bg-white text-gray-800'
-              }`}
-            >
-              {filter}
-            </button>
-          ))}
-          
-          {/* Filter Button */}
-          <button
-            onClick={() => setShowFilterModal(true)}
-            className="px-6 py-3 rounded-full border-2 border-gray-300 hover:border-gray-400 bg-white text-gray-800 whitespace-nowrap transition-all duration-300 font-medium flex items-center space-x-2"
-          >
-            <Filter size={18} />
-            <span>Filters</span>
-          </button>
-        </div>
-      </div>
+    <div className="min-h-screen bg-black">
+     {/* Filter Bar */}
+<FilterBar
+  filters={filters}
+  selectedFilter={selectedFilter}
+  setSelectedFilter={setSelectedFilter}
+  setShowFilterModal={setShowFilterModal}
+/>
+
+
 
       {/* Hotel Cards Grid */}
       <div className="container mx-auto px-4 py-8">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
           {hotelData.map((hotel) => (
             <HotelCard key={hotel.id} hotel={hotel} />
           ))}
@@ -544,7 +460,7 @@ const Grp_card = () => {
       </div>
 
       {/* Filter Modal */}
-      {showFilterModal && <FilterModal />}
+      {showFilterModal && <FilterModal filters={filters2}/>}
     </div>
   );
 };
